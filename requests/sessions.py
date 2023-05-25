@@ -295,10 +295,12 @@ class SessionRedirectMixin:
             # authentication headers.
             del headers["Authorization"]
 
-        # .netrc might have more auth for us on our new host.
-        new_auth = get_netrc_auth(url) if self.trust_env else None
-        if new_auth is not None:
-            prepared_request.prepare_auth(new_auth)
+        if "Authorization" not in headers:
+            # Only rebuild auth if the header is not explicitly set.
+            # .netrc might have more auth for us on our new host.
+            new_auth = get_netrc_auth(url) if self.trust_env else None
+            if new_auth is not None:
+                prepared_request.prepare_auth(new_auth)
 
     def rebuild_proxies(self, prepared_request, proxies):
         """This method re-evaluates the proxy configuration by considering the
